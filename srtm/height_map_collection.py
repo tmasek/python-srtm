@@ -94,23 +94,30 @@ class HeightMapCollection:
         end_latitude: float,
         end_longitude: float,
         apply_earth_curvature=True,
+        num_steps: int=10,
     ) -> List[ElevationProfilePoint]:
         """Get the elevation profile between the two points given"""
         values_per_degree = self.height_map_class.values_per_row
 
-        def to_int(lat_lng: float) -> int:
-            return round(lat_lng * values_per_degree)
+        # def to_int(lat_lng: float) -> int:
+        #     return round(lat_lng * values_per_degree)
+        # 
+        # def to_float(lat_lng_int: int) -> float:
+        #     return lat_lng_int / values_per_degree
+        # 
+        # points = points_on_line(
+        #     x1=to_int(start_latitude),
+        #     y1=to_int(start_longitude),
+        #     x2=to_int(end_latitude),
+        #     y2=to_int(end_longitude),
+        # )
+        # converted_points = [(to_float(x), to_float(y)) for x, y in points]
 
-        def to_float(lat_lng_int: int) -> float:
-            return lat_lng_int / values_per_degree
-
-        points = points_on_line(
-            x1=to_int(start_latitude),
-            y1=to_int(start_longitude),
-            x2=to_int(end_latitude),
-            y2=to_int(end_longitude),
-        )
-        converted_points = [(to_float(x), to_float(y)) for x, y in points]
+        dx = float(end_longitude - start_longitude)/num_steps
+        dy = float(end_latitude - start_latitude)/num_steps
+        converted_points = [(start_latitude  + _*dy,
+                             start_longitude + _*dx)
+                            for _ in range(num_steps + 1)]
 
         elevations = []
         for latitude, longitude in converted_points:
